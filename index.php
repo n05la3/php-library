@@ -7,7 +7,7 @@
                 display: block;            
             }            
             input{                
-                width: default;                
+                                
             }
             div{
                // padding-right: 500px;
@@ -22,8 +22,43 @@
                 width: 17em;
             }
         </style>
-        <title>handling multi form values</title>
+        <title>Required field form validation</title>
     </head>
+    
+    <body>
+    <?php
+    //verifying the submit button has been clicked for form submission
+    function check_if_submitted($submit_button)
+    {
+        if(isset($_POST[$submit_button])||isset($_GET[$submit_button]))
+            return true;
+    }
+    
+    $required_fields=array('first_name','last_name','pass1','pass2');
+    $missing_fields=array();
+    $filled_fields=array();
+    
+    //placing unfilled fields into $missing_fields and filled fields $filled_fields
+    function is_field_set(array $form_key)
+    {
+        if(isset($_POST[$form_key]))
+        {
+            global $filled_fields;
+            $filled_fields = $_POST[$form_key];
+        }
+        else 
+        {
+            global $missing_field;
+            $missing_field=$_POST[$form_key];    
+        }
+    }
+    
+    function validate_form($required_fields)
+    {
+        
+    }
+    ?>
+    
     <div>
         <form action="index.php" method="post">
             <label for="first_name">*First Name:</label>
@@ -51,4 +86,5 @@
             <input type="submit" value="submit" id="submit" name="submit">
         </form>
     </div>
+    </body>
 </html>
