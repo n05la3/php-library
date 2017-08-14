@@ -47,7 +47,7 @@
             <label for="newsletter">Do you want to receive our <br> newsletter?</label>
             <input type="checkbox" name="newsletter" id="" value="yes">
             <label for="comments">Any comments?</label>
-            <textarea name="comment" id="comment" value="" cols="50" rows="5"></textarea><br><br>
+            <textarea name="comment" id="comment" value="" cols="50" rows="5" placeholder="Just in few words, leave your comment"></textarea><br><br>
             <input type="submit" value="submit" id="submit" name="submit">
         </form>
     </div>
