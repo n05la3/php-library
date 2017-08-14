@@ -1,3 +1,5 @@
+<!--The script cannot be used directly, the superglobal $_POST and $_GET have been accessed without any security concerns,
+modify this security issue before using the script in your project.-->
 <html>
     <head>
         <style>
