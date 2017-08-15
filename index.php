@@ -37,28 +37,39 @@ modify this security issue before using the script in your project.-->
     }
     
     $required_fields=array('first_name','last_name','pass1','pass2');
+    global $missing_fields;
     $missing_fields=array();
     $filled_fields=array();
     
     //placing unfilled fields into $missing_fields and filled fields $filled_fields
-    function is_field_set(array $form_key)
+    function is_field_set($form_key)
     {
-        if(isset($_POST[$form_key]))
+        //echo "I am here<br>";
+        if(!isset($_POST[$form_key]) or !$_POST[$form_key])
         {
-            global $filled_fields;
-            $filled_fields = $_POST[$form_key];
+            //echo "yah me here";
+            global $missing_fields;
+            $missing_fields[0]=$form_key."<br>";
+            echo $missing_fields[0];            
         }
-        else 
-        {
-            global $missing_field;
-            $missing_field=$_POST[$form_key];    
-        }
+        else
+            return($form_key & 1);        
     }
     
     function validate_form($required_fields)
     {
-        
+        global $filled_fields;
+        $filled_fields=array_filter($required_fields, "is_field_set"); 
+        global $missing_fields;
+        if($missing_fields)
+            return true;//missing fields exist
+        else 
+            return false;//form was correctly filled.
     }
+    
+    echo validate_form($required_fields);
+    echo $missing_fields[0];
+    
     ?>
     
     <div>
@@ -68,7 +79,7 @@ modify this security issue before using the script in your project.-->
             <label for="last_name">*Last Name:</label>
             <input type="text" value="" id="last_name" name="last_name">
             <label for="pass1">*Password:</label>
-            <input type="password" value="" id="pass1" name="pass" placeholder="Enter your password">
+            <input type="password" value="" id="pass1" name="pass1" placeholder="Enter your password">
             <label for="pass2">*Re-enter password:</label>
             <input type="password" value="" id="pass2" name="pass2" placeholder="Re-enter password">
             <label for="widget">What's your favorite widget?</label>
