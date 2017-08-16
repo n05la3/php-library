@@ -23,6 +23,12 @@ modify this security issue before using the script in your project.-->
             select{
                 width: 17em;
             }
+            .error{
+                color: red;
+            }
+            .success{
+                color: green;
+            }
         </style>
         <title>Required field form validation</title>
     </head>
@@ -36,6 +42,7 @@ modify this security issue before using the script in your project.-->
             return true;
     }
     
+    $success_message="<div class='success'><h3>Thanks for registering</h3><p>Your application has been received</p></div>";
     $required_fields=array('first_name','last_name','pass1','pass2','gender');
     global $missing_fields;
     $missing_fields=array();
@@ -68,17 +75,23 @@ modify this security issue before using the script in your project.-->
     }
     
     //for filling already filled fields which are filled by checking
-    function set_check($missing_fields,$field_to_check)
+    function set_check($field_name,$field_value)
     {    
-        if(in_array($field_to_check,$missing_fields, true))
+        if(isset($_POST[$field_name]) && $field_value===$_POST[$field_name])
                 echo 'checked="checked"';
     }
     //for filling already filled fields which are filled by selecting
-    function set_select($missing_fields,$field_to_check)
+    function set_selected($field_name,$field_name)
     {
-        if(in_array($field_to_check,$missing_fields, true))
+        if(isset($_POST[$field_name])&& $field_value===$_POST[$field_name])
                 echo 'selected="selected"';
     }
+    //fill field with value user had entered
+    function set_value($field_name)
+    {
+        if(isset($_POST[$field_name]))                
+            echo $_POST[$field_name];   
+    }    
     ?>
     <?php
     function first_display($missing_fields)
@@ -98,14 +111,13 @@ modify this security issue before using the script in your project.-->
        }
     }
 
-    function marked_fields($missing_fields)
+    function not_filled($field_name,$missing_fields)
     {
-        if(check_if_submitted('submit')===true && $missing_field)
-            echo 'class="error"';
-    }?>
-    
-    <?php
-    function resend_button()
+        if(in_array($filed_name, $missing_fields))
+            echo 'class="error" ';
+    }
+        
+    function button_value()
     {
         if(check_if_submitted('submit')===true && $missing_field)
             echo 'value="Resend details"';
@@ -113,34 +125,43 @@ modify this security issue before using the script in your project.-->
             echo 'value="Send Details"';
     }
     
+    function congrats($success_message)
+    {
+        echo "$success_message";
+    }
+    
     function display_form($missing_fields)
     {?>
         <div>
             <form action="index.php" method="post">
-                <label <?php marked_fields($missing_fieldsg)?> for="first_name">*First Name:</label>
-                <input  type="text" value="" id="first_name" name="first_name">
-                <label <?php marked_fields($missing_fieldsg)?>  for="last_name">*Last Name:</label>
-                <input type="text" value="" id="last_name" name="last_name">
-                <label <?php marked_fields($missing_fieldsg)?>  for="pass1">*Password:</label>
+                <label for="first_name" <?php not_filled('first_name', $missing_fields);?>>*First Name:</label>
+                <input type="text" value="<?php set_value('first_name');?>" id="first_name" name="first_name">
+                <label for="last_name" <?php not_filled('first_name', $missing_fields);?>>*Last Name:</label>
+                <input type="text" value="<?php set_value('last_name') ?>" id="last_name" name="last_name">
+                <label for="pass1" <?php not_filled('pass1', $missing_fields);?>>*Password:</label>
                 <input type="password" value="" id="pass1" name="pass1" placeholder="Enter your password">
-                <label <?php marked_fields($missing_fieldsg)?>  for="pass2">*Re-enter password:</label>
+                <label for="pass2" <?php not_filled('pass2', $missing_fields);?>>*Re-enter password:</label>
                 <input type="password" value="" id="pass2" name="pass2" placeholder="Re-enter password">
-                <label <?php marked_fields($missing_fieldsg)?>  for="widget">What's your favorite widget?</label>
-                <select name="select_form" size="3" multiple="multiple">
-                    <option value="mega_widget">Mega Widget</option>
-                    <option value="dec_wideget">Deca Widget</option>
-                    <option value="tera_widget">Tera Widget</option>
-                    <option value="nano_widget">Nano Widget</option>
+                <label for="widget">What's your favorite widget?</label>
+                <select name="selected_widget[]" size="1">
+                    <option <?php set_selected('selected_widget', 'mega_widget');?> value="mega_widget">Mega Widget</option>
+                    <option <?php set_selected("selected_widget", 'dec_widget');?> value="dec_wideget">Deca Widget</option>
+                    <option <?php set_selected('selected_widget', 'tera_widget');?> value="tera_widget">Tera Widget</option>
+                    <option <?php set_selected('selected_widget', 'nano_widget');?> value="nano_widget">Nano Widget</option>
                 </select> <br><br>
                 <label for="gender">Your Gender:</label>
-                <span>Male:</span><input type="radio" value="male" name="gender" id="gen">
-                <span>Female:</span><input type="radio" value="female" name="gender" id="gen"><br>   
+                <span>Male:</span><input type="radio" value="male" name="gender" <?php set_check("gender", "male");?> id="gender">
+                <span>Female:</span><input type="radio" value="female" name="gender" <?php set_check("gender", "female")?> id="gender"><br>   
                 <label for="newsletter">Do you want to receive our <br> newsletter?</label>
-                <input type="checkbox" name="newsletter" id="" value="yes">
+                <input type="checkbox" name="newsletter" id="" value="yes" <?php set_check("newsletter", "yes")?>>
                 <label for="comments">Any comments?</label>
-                <textarea name="comment" id="comment" value="" cols="50" rows="5" placeholder="Just in few words, leave your comment"></textarea><br><br>
-                <input type="submit" value="submit" id="submit" name="submit">
+                <textarea name="comment" id="comment" <?php set_value('newsletter')?>value="" cols="50" rows="5" placeholder="Just in few words, leave your comment">
+                </textarea><br><br>
+                <input type="submit" value="<?php button_value();?>" id="submit" name="submit">
             </form>
         </div>
+    <?php 
+    } ?>
         </body>
     </html>
+    
