@@ -35,45 +35,42 @@ modify this security issue before using the script in your project.-->
     
     <body>
     <?php
-    //verifying the submit button has been clicked for form submission
-    function check_if_submitted($submit_button)
-    {
-        if(isset($_POST[$submit_button])||isset($_GET[$submit_button]))
-            return true;
-    }
-    
-    $success_message="<div class='success'><h3>Thanks for registering</h3><p>Your application has been received</p></div>";
-    $required_fields=array('first_name','last_name','pass1','pass2','gender');
-    global $missing_fields;
     $missing_fields=array();
-    $filled_fields=array();
     
+    first_display();
+    //building the main
+    if(!isset($_POST['submit']))
+    {
+        display_form($missing_fields);
+    }  
+    else
+        process_form();    
+    
+    function process_form()
+    {
+        $required_fields=array('first_name','last_name','pass1','pass2','gender');
+        $missing_fields=array_filter($required_fields, "is_field_set"); 
+        display_form($missing_fields);
+        if($missing_fields)
+            display_form ($missing_fields);
+        else
+        {
+            $success_message="<div class='success'><h3>Thanks for registering</h3><p>Your application has been received</p></div>";
+            congrats ($success_message);
+        }            
+    }
     //placing unfilled fields into $missing_fields and filled fields $filled_fields
     function is_field_set($form_key)
     {
         //echo "I am here<br>";
+        //echo $form_key;
         if(!isset($_POST[$form_key]) or !$_POST[$form_key])
         {
-            //echo "yah me here";
-            global $missing_fields;
-            if($form_key!=='pass1' or $form_key!=='pass2')
-                $missing_fields[]=$form_key."<br>";           
+            return($form_key);             
         }
-        else
-            return($form_key & 1);        
+                                        
     }
-    
-    function validate_form($required_fields)
-    {
-        global $filled_fields;
-        $filled_fields=array_filter($required_fields, "is_field_set"); 
-        global $missing_fields;
-        if($missing_fields)
-            return true;//missing fields exist
-        else 
-            return false;//form was correctly filled.
-    }
-    
+        
     //for filling already filled fields which are filled by checking
     function set_check($field_name,$field_value)
     {    
@@ -91,21 +88,19 @@ modify this security issue before using the script in your project.-->
     {
         if(isset($_POST[$field_name]))                
             echo $_POST[$field_name];   
-    }    
-    ?>
-    <?php
-    function first_display($missing_fields)
+    }   
+    function first_display()
     {
-       if(check_if_submitted('submit')!=='true')
-       {?>
+       if(!isset($_POST['submit']))
+       { ?>
         <p>Welcome to Noslac's registration page, enter your details and click submit. Fields marked in asterisk(*) are required</p>
         <?php 
        }
        else
        {
-           if(check_if_submitted('submit')===true && $missing_field)
-           {?>
-            <p class="refill">There were some problems with the form you submitted, refill forms highlighted and resend</p><?php
+           if(isset($_POST['submit']))
+           { ?>
+            <p class="error">There were some problems with the form you submitted, refill forms highlighted and resend</p><?php
            }
            return true;
        }
@@ -113,16 +108,16 @@ modify this security issue before using the script in your project.-->
 
     function not_filled($field_name,$missing_fields)
     {
-        if(in_array($filed_name, $missing_fields))
-            echo 'class="error" ';
+        if(in_array($field_name, $missing_fields))
+            echo 'class="error"';
     }
         
-    function button_value()
+    function button_value($missing_field)
     {
-        if(check_if_submitted('submit')===true && $missing_field)
-            echo 'value="Resend details"';
+        if(isset($_POST['submit']))
+            echo 'Resend details';
         else
-            echo 'value="Send Details"';
+            echo 'Send Details';
     }
     
     function congrats($success_message)
@@ -144,20 +139,20 @@ modify this security issue before using the script in your project.-->
                 <input type="password" value="" id="pass2" name="pass2" placeholder="Re-enter password">
                 <label for="widget">What's your favorite widget?</label>
                 <select name="selected_widget[]" size="1">
-                    <option <?php set_selected('selected_widget', 'mega_widget');?> value="mega_widget">Mega Widget</option>
-                    <option <?php set_selected("selected_widget", 'dec_widget');?> value="dec_wideget">Deca Widget</option>
-                    <option <?php set_selected('selected_widget', 'tera_widget');?> value="tera_widget">Tera Widget</option>
-                    <option <?php set_selected('selected_widget', 'nano_widget');?> value="nano_widget">Nano Widget</option>
+                    <option <?php set_selected('selected_widget', 'mega_widget'); ?> value="mega_widget">Mega Widget</option>
+                    <option <?php set_selected("selected_widget", 'dec_widget'); ?> value="dec_wideget">Deca Widget</option>
+                    <option <?php set_selected('selected_widget', 'tera_widget'); ?> value="tera_widget">Tera Widget</option>
+                    <option <?php set_selected('selected_widget', 'nano_widget'); ?> value="nano_widget">Nano Widget</option>
                 </select> <br><br>
                 <label for="gender">Your Gender:</label>
-                <span>Male:</span><input type="radio" value="male" name="gender" <?php set_check("gender", "male");?> id="gender">
-                <span>Female:</span><input type="radio" value="female" name="gender" <?php set_check("gender", "female")?> id="gender"><br>   
+                <span>Male:</span><input type="radio" value="male" name="gender" <?php set_check("gender", "male"); ?> id="gender">
+                <span>Female:</span><input type="radio" value="female" name="gender" <?php set_check("gender", "female") ?> id="gender"><br>   
                 <label for="newsletter">Do you want to receive our <br> newsletter?</label>
-                <input type="checkbox" name="newsletter" id="" value="yes" <?php set_check("newsletter", "yes")?>>
+                <input type="checkbox" name="newsletter" id="" value="yes" <?php set_check("newsletter", "yes") ?>>
                 <label for="comments">Any comments?</label>
-                <textarea name="comment" id="comment" <?php set_value('newsletter')?>value="" cols="50" rows="5" placeholder="Just in few words, leave your comment">
+                <textarea name="comment" id="comment" value="<?php set_value('comment'); ?>" cols="50" rows="4" placeholder="In just few words, leave a comment">
                 </textarea><br><br>
-                <input type="submit" value="<?php button_value();?>" id="submit" name="submit">
+                <input type="submit" value=" <?php button_value($missing_fields); ?>" id="submit" name="submit">
             </form>
         </div>
     <?php 
